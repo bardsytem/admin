@@ -1,8 +1,8 @@
 // EmailJS Credentials
-const EMAILJS_PUBLIC_KEY = "RSpVYT7haB-C7CLDL";
-const EMAILJS_SERVICE_ID = "service_g2122gq";
-const EMAILJS_TEMPLATE_ID = "template_4eq0f7d";
-const EMAILJS_COMMISSION_TEMPLATE_ID = "template_mndf9s6";
+const EMAILJS_PUBLIC_KEY = "mNnKSDb8O20Hl5ctO";
+const EMAILJS_SERVICE_ID = "service_4i8715b";
+const EMAILJS_BOOKING_CONFIRM_TEMPLATE_ID = "template_7yab7no";
+const EMAILJS_COMMISSION_CONFIRM_TEMPLATE_ID = "template_45at9w1";
 
 // Supabase Credentials
 const SUPABASE_URL = "https://xakaodpxzahtyohmytao.supabase.co";

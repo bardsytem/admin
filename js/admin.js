@@ -3,6 +3,9 @@ const BUCKET = "gallery"; // Supabase Storage bucket for photos
 const MAX_SIZE = 35 * 1024 * 1024; // 35MB
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
+// Category value in the database -> name shown on the page
+const CATEGORY_NAMES = { mural: "Mural", canvas: "Canvas", others: "Others" };
+
 // ===================== Data kept while the page is open =====================
 let items = []; // all artworks from the database
 let filterCategory = "all";
@@ -14,6 +17,9 @@ let editingId = null; // null means we are adding a new artwork
 let newImageFile = null; // photo picked in the popup (not uploaded yet)
 let newPortraitFile = null; // portrait picked (not uploaded yet)
 let portraitUrl = null; // saved portrait
+
+let canvasPrices = {}; // price of each canvas artwork, keyed by artwork id
+let pricesLoaded = false; // true once the prices were read from the database
 
 // Profile column name -> input id
 const PROFILE_FIELDS = {
@@ -224,6 +230,23 @@ async function loadGallery() {
     return;
   }
   items = data;
+
+  // Prices of canvas artworks, shown in the Edit popup
+  const pricesResult = await supabaseClient
+    .from("canvas_prices")
+    .select("item_id, price");
+
+  if (pricesResult.error) {
+    console.error("Could not load canvas prices:", pricesResult.error);
+    pricesLoaded = false;
+  } else {
+    canvasPrices = {};
+    pricesResult.data.forEach((row) => {
+      canvasPrices[row.item_id] = row.price;
+    });
+    pricesLoaded = true;
+  }
+
   renderGallery();
 }
 
@@ -258,7 +281,7 @@ function makeCard(item) {
   const meta = [
     item.location,
     item.dimensions,
-    item.category === "mural" ? "Mural" : "Canvas",
+    CATEGORY_NAMES[item.category] || item.category,
   ]
     .filter(Boolean)
     .join(" • ");
@@ -267,6 +290,8 @@ function makeCard(item) {
   if (item.is_featured)
     leftBadges += '<span class="badge featured">★ Featured</span>';
   if (item.is_sold) leftBadges += '<span class="badge">Sold</span>';
+  if (item.not_for_sale)
+    leftBadges += '<span class="badge">Not for sale</span>';
 
   const statusBadge = item.is_visible
     ? '<span class="badge public">● Public</span>'
@@ -296,10 +321,12 @@ function renderGallery() {
   // Tab labels with counts
   const murals = items.filter((i) => i.category === "mural").length;
   const canvas = items.filter((i) => i.category === "canvas").length;
+  const others = items.filter((i) => i.category === "others").length;
   const tabNames = {
     all: "All (" + items.length + ")",
     mural: "Murals (" + murals + ")",
     canvas: "Canvas (" + canvas + ")",
+    others: "Others (" + others + ")",
   };
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.textContent = tabNames[tab.dataset.filter];
@@ -363,6 +390,38 @@ function setupGallery() {
 }
 
 // ===================== Edit / Add popup =====================
+// Show the price box and "Not for sale" switch only for canvas artworks
+function updateSaleBlock() {
+  const isCanvas = $("a-category").value === "canvas";
+  $("sale-block").hidden = !isCanvas;
+  $("a-price").disabled = $("a-notforsale").checked;
+}
+
+// Save or remove the price of a canvas artwork
+async function savePrice(itemId, row) {
+  if (!pricesLoaded) return; // never change prices we could not read
+
+  const price = $("a-price").value.trim();
+  const hasPrice =
+    row.category === "canvas" && !row.not_for_sale && price !== "";
+
+  let result;
+  if (hasPrice) {
+    // Only the base price is saved here. The materials price stays as it is
+    result = await supabaseClient
+      .from("canvas_prices")
+      .upsert({ item_id: itemId, price: Number(price) });
+  } else {
+    // Blank, not for sale, or not a canvas: no price of its own
+    result = await supabaseClient
+      .from("canvas_prices")
+      .delete()
+      .eq("item_id", itemId);
+  }
+
+  if (result.error) throw result.error;
+}
+
 function showPreview(src) {
   $("preview-img").hidden = !src;
   if (src) $("preview-img").src = src;
@@ -388,6 +447,10 @@ function openModal(id) {
   $("a-visible").checked = item ? item.is_visible : true;
   $("a-featured").checked = item ? item.is_featured : false;
   $("a-sold").checked = item ? item.is_sold : false;
+  $("a-price").value =
+    item && canvasPrices[item.id] !== undefined ? canvasPrices[item.id] : "";
+  $("a-notforsale").checked = item ? !!item.not_for_sale : false;
+  updateSaleBlock();
   updateCount("a-desc", "a-count");
   showPreview(item ? imgSrc(item.image_url) : "");
 
@@ -422,6 +485,12 @@ async function saveArtwork() {
     return;
   }
 
+  const priceText = $("a-price").value.trim();
+  if (priceText !== "" && isNaN(Number(priceText))) {
+    toast("Please enter a valid price.", true);
+    return;
+  }
+
   const button = $("modal-save");
   button.disabled = true;
   button.textContent = "Saving...";
@@ -444,6 +513,8 @@ async function saveArtwork() {
       is_visible: $("a-visible").checked,
       is_featured: $("a-featured").checked,
       is_sold: $("a-sold").checked,
+      not_for_sale:
+        $("a-category").value === "canvas" && $("a-notforsale").checked,
       image_url: imageUrl,
     };
 
@@ -468,12 +539,26 @@ async function saveArtwork() {
     if (result.data.length === 0)
       throw new Error("Not allowed. Please log in again.");
 
+    // Save the price too (only canvas artworks have one)
+    let priceSaved = true;
+    try {
+      await savePrice(result.data[0].id, row);
+    } catch (priceError) {
+      console.error(priceError);
+      priceSaved = false;
+    }
+
     // Saved. Remove the replaced photo from storage
     if (newImageFile) deleteImage(oldImageUrl);
 
     await loadGallery();
     closeModal();
-    toast(item ? "Artwork updated." : "Artwork added.");
+
+    if (priceSaved) {
+      toast(item ? "Artwork updated." : "Artwork added.");
+    } else {
+      toast("Artwork saved, but the price could not be saved.", true);
+    }
   } catch (err) {
     console.error(err);
     toast("Could not save: " + err.message, true);
@@ -514,6 +599,13 @@ function setupModal() {
   $("modal-save").addEventListener("click", saveArtwork);
   $("modal-delete").addEventListener("click", () => deleteArtwork(editingId));
   $("a-desc").addEventListener("input", () => updateCount("a-desc", "a-count"));
+
+  // Canvas artworks can have a price or be marked "not for sale"
+  $("a-category").addEventListener("change", updateSaleBlock);
+  $("a-notforsale").addEventListener("change", updateSaleBlock);
+  $("a-price").addEventListener("input", () => {
+    $("a-price").value = $("a-price").value.replace(/[^0-9.]/g, "");
+  });
 
   // Click on the dark background closes the popup
   $("modal").addEventListener("click", (e) => {

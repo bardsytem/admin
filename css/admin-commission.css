@@ -85,3 +85,146 @@
 .money-wrap span {
   z-index: 1;
 }
+
+/* ---------- Canvas artwork picker (replaces the scale buttons) ---------- */
+.canvas-pick {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.canvas-pick[hidden],
+.canvas-pick .btn[hidden] {
+  display: none;
+}
+
+.canvas-pick img {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid #2c2a26;
+  border-radius: 3px;
+}
+
+.canvas-pick .field {
+  flex: 1;
+  min-width: 0;
+}
+
+.canvas-pick .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ---------- Client commission requests (table) ---------- */
+.table-wrap {
+  overflow: auto;
+  border: 1px solid #2c2a26;
+  border-radius: 3px;
+  background: #151412;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9c968c;
+  padding: 12px;
+  border-bottom: 1px solid #2c2a26;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background: #151412;
+  z-index: 1;
+  box-shadow: inset 0 -1px 0 #2c2a26;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid #2c2a26;
+  vertical-align: top;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.table a {
+  color: #ff5a1f;
+}
+
+.table .details-cell {
+  max-width: 280px;
+  color: #9c968c;
+  overflow-wrap: anywhere;
+}
+
+.table .cost-cell {
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.cell-sub {
+  display: block;
+  color: #9c968c;
+  font-size: 11px;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.row-actions .btn-link,
+.row-actions .btn-confirm {
+  padding: 6px 10px;
+}
+
+.btn-confirm {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid #ff5a1f;
+  border-radius: 3px;
+  background: #ff5a1f;
+  color: #0b0b0a;
+  cursor: pointer;
+}
+
+.btn-confirm:hover {
+  background: #d6491a;
+}
+
+.btn-confirm:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.status-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #7bd88f;
+  border: 1px solid #2c2a26;
+  border-radius: 3px;
+  padding: 5px 8px;
+}
+
+/* Dark scrollbars */
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3833 #0b0b0a;
+}

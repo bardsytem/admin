@@ -162,6 +162,9 @@
             <button type="button" class="tab" data-filter="canvas">
               Canvas (0)
             </button>
+            <button type="button" class="tab" data-filter="others">
+              Others (0)
+            </button>
           </div>
 
           <div class="toolbar-right">
@@ -249,6 +252,7 @@
                 <select id="a-category" class="field">
                   <option value="mural">Mural</option>
                   <option value="canvas">Canvas</option>
+                  <option value="others">Others</option>
                 </select>
               </div>
             </div>
@@ -267,6 +271,26 @@
             <div class="form-row">
               <label for="a-location">Location / Wall Site</label>
               <input type="text" id="a-location" class="field" />
+            </div>
+
+            <!-- Only shown for canvas artworks -->
+            <div id="sale-block" hidden>
+              <div class="form-row">
+                <label for="a-price">Price (Commission &amp; Base Price)</label>
+                <input
+                  type="text"
+                  id="a-price"
+                  class="field"
+                  inputmode="decimal"
+                  placeholder="Leave blank to use the default canvas price"
+                />
+              </div>
+              <div class="checks">
+                <label>
+                  <input type="checkbox" id="a-notforsale" /> Not for sale
+                  (cannot be acquired)
+                </label>
+              </div>
             </div>
 
             <div class="form-row">

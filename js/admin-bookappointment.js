@@ -8,8 +8,13 @@
     "05:00 - 06:00 PM",
   ];
 
+  const MAX_VISIBLE = 5; // show this many rows, then scroll
+
   let bookings = []; // all bookings loaded from Supabase
+  let blocks = []; // all blocked windows loaded from Supabase
   let bookingsSort = "recent";
+  let bookingsFilter = "pending"; // "pending" | "confirmed" | "all"
+  let gmeetLink = ""; // the one Gmeet link sent to clients
 
   const el = {
     bookingsSort: document.getElementById("bookings-sort"),
@@ -25,6 +30,10 @@
     bookingsWrap: document.getElementById("bookings-wrap"),
     bookingsBody: document.getElementById("bookings-body"),
     toast: document.getElementById("toast"),
+    tabs: document.querySelectorAll(".tabs .tab"),
+    gmeetInput: document.getElementById("gmeet-input"),
+    gmeetSave: document.getElementById("gmeet-save"),
+    gmeetDelete: document.getElementById("gmeet-delete"),
   };
 
   // ---------- Helpers ----------
@@ -51,7 +60,50 @@
     ).join("");
   }
 
+  // Today as YYYY-MM-DD in the user's local time
+  function todayString() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 10);
+  }
+
+  // Limits a box to the height of its first `max` rows, then it scrolls
+  function capHeight(box, rows, max, extra) {
+    if (rows.length <= max) {
+      box.style.maxHeight = "";
+      return;
+    }
+    let height = extra || 0;
+    for (let i = 0; i < max; i++) height += rows[i].offsetHeight;
+    box.style.maxHeight = height + "px";
+  }
+
+  function limitBlockedList() {
+    const items = el.blockedList.querySelectorAll(".block-item");
+    // 10px = the gap between items, so 4 gaps between 5 items
+    capHeight(el.blockedList, items, MAX_VISIBLE, (MAX_VISIBLE - 1) * 10);
+  }
+
+  function limitBookingsTable() {
+    const rows = el.bookingsBody.querySelectorAll("tr");
+    const head = el.bookingsWrap.querySelector("thead");
+    capHeight(el.bookingsWrap, rows, MAX_VISIBLE, head.offsetHeight + 2);
+  }
+
   // ---------- Blocked dates ----------
+  // Same date range overlaps AND the time slots clash
+  // ("All Day" clashes with every slot)
+  function findConflict(start, end, slot) {
+    return blocks.find(
+      (b) =>
+        b.start_date <= end &&
+        b.end_date >= start &&
+        (b.time_range === slot ||
+          b.time_range === "All Day" ||
+          slot === "All Day"),
+    );
+  }
+
   async function loadBlocks() {
     const { data, error } = await supabaseClient
       .from("blocked_dates")
@@ -64,11 +116,13 @@
       return;
     }
 
+    blocks = data;
     el.blockedTitle.textContent = `Active Blocked Windows (${data.length})`;
 
     if (!data.length) {
       el.blockedState.textContent = "No blocked windows.";
       el.blockedList.innerHTML = "";
+      limitBlockedList();
       return;
     }
 
@@ -93,6 +147,8 @@
         `;
       })
       .join("");
+
+    limitBlockedList();
   }
 
   async function addBlock() {
@@ -103,8 +159,16 @@
       toast("Pick a date first.", true);
       return;
     }
+    if (start < todayString()) {
+      toast("You can't block a date that already passed.", true);
+      return;
+    }
     if (end < start) {
       toast("The end date can't be before the start date.", true);
+      return;
+    }
+    if (findConflict(start, end, el.blockTime.value)) {
+      toast("That date and time is already blocked.", true);
       return;
     }
 
@@ -130,6 +194,7 @@
     el.blockDate.value = "";
     el.blockEnd.value = "";
     el.blockNote.value = "";
+    el.blockEnd.min = todayString();
     toast("Time blocked successfully.");
     loadBlocks();
   }
@@ -150,6 +215,20 @@
     loadBlocks();
   }
 
+  // Past dates can't be picked in the calendar
+  function initDateLimits() {
+    const today = todayString();
+    el.blockDate.min = today;
+    el.blockEnd.min = today;
+
+    el.blockDate.addEventListener("change", () => {
+      el.blockEnd.min = el.blockDate.value || today;
+      if (el.blockEnd.value && el.blockEnd.value < el.blockEnd.min) {
+        el.blockEnd.value = "";
+      }
+    });
+  }
+
   // ---------- Client bookings ----------
   // "10:00 - 11:00 AM" -> minutes since midnight, so slots sort within a day
   function slotMinutes(slot) {
@@ -165,8 +244,28 @@
     return isNaN(t) ? 0 : t;
   }
 
+  function isConfirmed(b) {
+    return b.status === "confirmed";
+  }
+
+  function findBooking(id) {
+    return bookings.find((b) => String(b.id) === String(id));
+  }
+
+  // "virtual" | "studio" | "onsite" (anything else counts as onsite)
+  function meetingKind(type) {
+    const t = String(type || "").toLowerCase();
+    if (/virtual|online|meet/.test(t)) return "virtual";
+    if (/studio/.test(t)) return "studio";
+    return "onsite";
+  }
+
   function sortedBookings() {
-    const list = [...bookings];
+    let list = [...bookings];
+
+    if (bookingsFilter === "pending")
+      list = list.filter((b) => !isConfirmed(b));
+    if (bookingsFilter === "confirmed") list = list.filter(isConfirmed);
 
     if (bookingsSort === "oldest") {
       list.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
@@ -189,18 +288,38 @@
     return list;
   }
 
+  function updateTabCounts() {
+    const confirmed = bookings.filter(isConfirmed).length;
+    const labels = {
+      pending: `To be confirmed (${bookings.length - confirmed})`,
+      confirmed: `Confirmed (${confirmed})`,
+      all: `All (${bookings.length})`,
+    };
+    el.tabs.forEach((tab) => {
+      tab.textContent = labels[tab.dataset.filter];
+      tab.classList.toggle("is-active", tab.dataset.filter === bookingsFilter);
+    });
+  }
+
   function renderBookings() {
-    if (!bookings.length) {
-      el.bookingsState.textContent = "No client bookings yet.";
+    updateTabCounts();
+    const list = sortedBookings();
+
+    if (!list.length) {
+      el.bookingsState.textContent = !bookings.length
+        ? "No client bookings yet."
+        : bookingsFilter === "confirmed"
+          ? "No confirmed bookings yet."
+          : "Nothing waiting to be confirmed.";
       el.bookingsWrap.hidden = true;
       return;
     }
 
     el.bookingsState.textContent = "";
     el.bookingsWrap.hidden = false;
-    el.bookingsBody.innerHTML = sortedBookings()
-      .map(
-        (b) => `
+    el.bookingsBody.innerHTML = list
+      .map((b) => {
+        return `
           <tr>
             <td>${esc(b.booking_date)}</td>
             <td>${esc(b.time_slot)}</td>
@@ -209,13 +328,27 @@
               <a href="mailto:${esc(b.client_email)}">${esc(b.client_email)}</a>
               ${b.client_phone ? `<br />${esc(b.client_phone)}` : ""}
             </td>
-            <td>${esc(b.meeting_type)}</td>
+            <td>
+              ${esc(b.meeting_type)}
+            </td>
             <td class="details-cell">${esc(b.details)}</td>
-            <td><button type="button" class="btn-link" data-id="${b.id}">Cancel</button></td>
+            <td>
+              <div class="row-actions">
+                ${
+                  isConfirmed(b)
+                    ? `<span class="status-pill">Confirmed</span>`
+                    : `<button type="button" class="btn-confirm" data-act="confirm" data-id="${b.id}">Confirm</button>`
+                }
+                <button type="button" class="btn-link" data-act="cancel" data-id="${b.id}">Cancel</button>
+              </div>
+            </td>
           </tr>
-        `,
-      )
+        `;
+      })
       .join("");
+
+    // The wrapper is visible now, so the row heights can be measured
+    limitBookingsTable();
   }
 
   async function loadBookings() {
@@ -233,6 +366,86 @@
 
     bookings = data;
     renderBookings();
+  }
+
+  // ---------- Emails (EmailJS) ----------
+  // Virtual + link, or studio visit -> "accepted" message
+  // Onsite inspection, or virtual with NO link -> "acknowledged" notice
+  function buildEmail(b) {
+    const kind = meetingKind(b.meeting_type);
+    const link = gmeetLink;
+    const accepted = kind === "studio" || (kind === "virtual" && link);
+
+    return {
+      to_email: b.client_email,
+      to_name: b.client_name,
+      subject: accepted
+        ? "Your booking has been accepted"
+        : "Your request has been acknowledged",
+      message: accepted
+        ? "Your booking has been accepted. Please be on time in the said time."
+        : "The request has been acknowledged. Bard will contact you within a day, between 10:00 AM and 12:00 MN.",
+      booking_date: b.booking_date,
+      time_slot: b.time_slot,
+      meeting_type: b.meeting_type,
+      meet_link_line:
+        kind === "virtual" && link ? `Google Meet link: ${link}` : "",
+    };
+  }
+
+  function sendEmail(b) {
+    return emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_BOOKING_CONFIRM_TEMPLATE_ID,
+      buildEmail(b),
+    );
+  }
+
+  // ---------- Confirm / cancel ----------
+  async function confirmBooking(id, btn) {
+    const b = findBooking(id);
+    if (!b) return;
+    const noLink = meetingKind(b.meeting_type) === "virtual" && !gmeetLink;
+    const question = noLink
+      ? `No Gmeet link is saved, so ${b.client_email} will get the "Bard will contact you" notice. Continue?`
+      : `Confirm this booking and email ${b.client_email}?`;
+    if (!confirm(question)) return;
+
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+
+    try {
+      await sendEmail(b);
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      const reason =
+        err && (err.text || err.message)
+          ? ` (${err.status || ""} ${err.text || err.message})`
+          : "";
+      toast(
+        "Could not send the email" + reason + ". Booking was not confirmed.",
+        true,
+      );
+      btn.disabled = false;
+      btn.textContent = "Confirm";
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from("appointments")
+      .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      toast("Email sent, but could not save the status.", true);
+      btn.disabled = false;
+      btn.textContent = "Confirm";
+      return;
+    }
+
+    toast("Booking confirmed and client notified.");
+    loadBookings();
   }
 
   async function cancelBooking(id) {
@@ -253,6 +466,77 @@
     loadBookings();
   }
 
+  // ---------- Gmeet link (one link for all virtual meetings) ----------
+  function showGmeet() {
+    el.gmeetInput.value = gmeetLink;
+    el.gmeetDelete.disabled = !gmeetLink;
+  }
+
+  async function loadGmeet() {
+    const { data, error } = await supabaseClient
+      .from("site_settings")
+      .select("value")
+      .eq("key", "gmeet_link")
+      .maybeSingle();
+
+    if (error) {
+      console.error(error);
+      toast("Could not load the Gmeet link.", true);
+      return;
+    }
+    gmeetLink = data?.value || "";
+    showGmeet();
+  }
+
+  async function saveGmeet() {
+    const link = el.gmeetInput.value.trim();
+    if (!/^https?:\/\/\S+$/i.test(link)) {
+      toast(
+        "Paste a valid link, e.g. https://meet.google.com/abc-defg-hij",
+        true,
+      );
+      return;
+    }
+
+    el.gmeetSave.disabled = true;
+    const { error } = await supabaseClient
+      .from("site_settings")
+      .upsert({ key: "gmeet_link", value: link }, { onConflict: "key" });
+    el.gmeetSave.disabled = false;
+
+    if (error) {
+      console.error(error);
+      toast("Could not save the link.", true);
+      return;
+    }
+    gmeetLink = link;
+    showGmeet();
+    toast("Gmeet link saved. It goes out when you confirm a virtual meeting.");
+  }
+
+  async function deleteGmeet() {
+    if (
+      !confirm(
+        "Remove the Gmeet link? Virtual meetings you confirm will get the 'Bard will contact you' notice until you add a new link.",
+      )
+    )
+      return;
+
+    const { error } = await supabaseClient
+      .from("site_settings")
+      .delete()
+      .eq("key", "gmeet_link");
+
+    if (error) {
+      console.error(error);
+      toast("Could not remove the link.", true);
+      return;
+    }
+    gmeetLink = "";
+    showGmeet();
+    toast("Gmeet link removed.");
+  }
+
   // ---------- Events ----------
   function bindEvents() {
     el.blockBtn.addEventListener("click", addBlock);
@@ -271,13 +555,34 @@
     });
 
     el.bookingsBody.addEventListener("click", (e) => {
-      const btn = e.target.closest(".btn-link");
-      if (btn) cancelBooking(btn.dataset.id);
+      const btn = e.target.closest("button[data-act]");
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (btn.dataset.act === "confirm") confirmBooking(id, btn);
+      if (btn.dataset.act === "cancel") cancelBooking(id);
+    });
+
+    el.tabs.forEach((tab) =>
+      tab.addEventListener("click", () => {
+        bookingsFilter = tab.dataset.filter;
+        renderBookings();
+      }),
+    );
+
+    el.gmeetSave.addEventListener("click", saveGmeet);
+    el.gmeetDelete.addEventListener("click", deleteGmeet);
+
+    // Row heights change when the window is resized, so measure again
+    window.addEventListener("resize", () => {
+      limitBlockedList();
+      limitBookingsTable();
     });
   }
 
   initTimeSelect();
+  initDateLimits();
   bindEvents();
   loadBlocks();
   loadBookings();
+  loadGmeet();
 })();

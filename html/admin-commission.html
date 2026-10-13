@@ -58,9 +58,28 @@
               <div class="option-row" id="category-options"></div>
             </div>
 
-            <div class="form-row">
+            <div class="form-row" id="scale-row">
               <span class="mini-label">2. Scope / Scale</span>
               <div class="option-row" id="scale-options"></div>
+            </div>
+
+            <!-- Shown instead of Scope / Scale when Canvas Piece is picked -->
+            <div class="form-row" id="canvas-block" hidden>
+              <span class="mini-label">2. Canvas Artwork</span>
+              <p class="state" id="canvas-state">Loading canvas pieces...</p>
+
+              <div class="canvas-pick" id="canvas-panel" hidden>
+                <img id="canvas-img" alt="" hidden />
+                <select id="canvas-select" class="field"></select>
+                <button
+                  type="button"
+                  id="canvas-reset"
+                  class="btn btn-outline"
+                  hidden
+                >
+                  Use default price
+                </button>
+              </div>
             </div>
 
             <p class="hint" id="scale-hint"></p>
@@ -125,6 +144,54 @@
               Update Rates
             </button>
           </div>
+        </div>
+      </section>
+
+      <!-- ================= Client commission requests ================= -->
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">
+            <h2>Client Commission Requests</h2>
+            <p class="section-sub">
+              Quotations clients submitted on the public page. Confirming a
+              request emails the client. Cancelling removes it.
+            </p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="tabs" id="cr-tabs" role="tablist">
+            <button type="button" class="tab is-active" data-filter="pending">
+              To be confirmed (0)
+            </button>
+            <button type="button" class="tab" data-filter="confirmed">
+              Confirmed (0)
+            </button>
+            <button type="button" class="tab" data-filter="all">All (0)</button>
+          </div>
+          <div class="toolbar-right">
+            <select id="cr-sort" class="field" aria-label="Sort requests">
+              <option value="recent">Sort: Recent request</option>
+              <option value="oldest">Sort: Oldest request</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="state" id="cr-state">Loading...</p>
+        <div class="table-wrap" id="cr-wrap" hidden>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Received</th>
+                <th>Client</th>
+                <th>Request</th>
+                <th>Est. Cost</th>
+                <th>Details</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="cr-body"></tbody>
+          </table>
         </div>
       </section>
     </main>

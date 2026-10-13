@@ -115,18 +115,52 @@
               booking frees the time slot again.
             </p>
           </div>
-          <div style="margin-bottom: 12px">
-            Sort by:
-            <select
-              id="bookings-sort"
-              class="field"
-              style="width: auto"
-              aria-label="Sort bookings"
+        </div>
+
+        <div class="card gmeet-card">
+          <div class="label-line">
+            <div class="card-title">
+              <span class="dot"></span> Provide Gmeet Link
+            </div>
+            <span class="muted-note">link to be sent on client gmail</span>
+          </div>
+          <input
+            type="url"
+            id="gmeet-input"
+            class="field"
+            placeholder="Type gmeet link here...."
+          />
+          <div class="link-actions">
+            <button type="button" id="gmeet-save" class="btn btn-solid">
+              Save
+            </button>
+            <button
+              type="button"
+              id="gmeet-delete"
+              class="btn btn-outline"
+              disabled
             >
-              <option value="recent">Recent inquiry</option>
-              <option value="oldest">Oldest inquiry</option>
-              <option value="date-asc">Appointment date (Soonest)</option>
-              <option value="date-desc">Appointment date (Last)</option>
+              Remove
+            </button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="tabs" role="tablist">
+            <button type="button" class="tab is-active" data-filter="pending">
+              To be confirmed (0)
+            </button>
+            <button type="button" class="tab" data-filter="confirmed">
+              Confirmed (0)
+            </button>
+            <button type="button" class="tab" data-filter="all">All (0)</button>
+          </div>
+          <div class="toolbar-right">
+            <select id="bookings-sort" class="field" aria-label="Sort bookings">
+              <option value="recent">Sort: Recent inquiry</option>
+              <option value="oldest">Sort: Oldest inquiry</option>
+              <option value="date-asc">Sort: Appointment date (Soon)</option>
+              <option value="date-desc">Sort: Appointment date (Last)</option>
             </select>
           </div>
         </div>
