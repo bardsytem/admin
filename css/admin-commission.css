@@ -1,0 +1,87 @@
+/* ---------- Three-card layout ---------- */
+.pricing-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* The category / scale card takes the whole top row */
+.pricing-panel > .card:first-child {
+  grid-column: 1 / -1;
+}
+
+/* ---------- Category / scale buttons ---------- */
+.option-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Keep the buttons on one straight line on desktop */
+@media (min-width: 961px) {
+  .option-row {
+    flex-wrap: nowrap;
+  }
+}
+
+.option-row .btn {
+  font-size: 11px;
+  padding: 9px 14px;
+}
+
+/* ---------- Price inputs with the peso sign inside ---------- */
+.money-wrap {
+  position: relative;
+}
+
+.money-wrap span {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9c968c;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.money-wrap .field {
+  padding-left: 28px;
+}
+
+/* ---------- Estimate card ---------- */
+.estimate-total {
+  font-size: 32px;
+  font-weight: 800;
+  color: #ff5a1f;
+  line-height: 1.1;
+}
+
+.hint {
+  font-size: 12px;
+  color: #9c968c;
+}
+
+.unsaved {
+  min-height: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ff5a1f;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .pricing-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.money-wrap span {
+  z-index: 1;
+}

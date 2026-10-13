@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bard's Canvas | Studio Console</title>
+    <link rel="stylesheet" href="../css/admin-login.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="top-bar">
+      <img
+        src="../assets/bards-logo.png"
+        alt="Bard's Canvas Logo"
+        class="bards-logo"
+      />
+      <h1>Bard's Canvas</h1>
+    </header>
+
+    <!-- Login card -->
+    <main class="login-main">
+      <section class="login-card">
+        <div class="brand">
+          <div class="brand-box">
+            <img src="../assets/bards-logo.png" alt="Bard's Canvas Logo" />
+          </div>
+          <div>
+            <div class="brand-name">Bard's Canvas</div>
+            <div class="brand-sub">Studio Console</div>
+          </div>
+        </div>
+
+        <h2>Sign In</h2>
+        <p class="subtext">
+          Enter your studio credentials to manage portfolio, bookings, and
+          quotations.
+        </p>
+
+        <form id="login-form">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            class="field"
+            placeholder="artist@canvas.studio"
+            autocomplete="username"
+            required
+          />
+
+          <label for="password">Password</label>
+          <div class="password-wrap">
+            <input
+              type="password"
+              id="password"
+              class="field"
+              autocomplete="current-password"
+              required
+            />
+            <button type="button" id="toggle-password">Show</button>
+          </div>
+
+          <div class="row">
+            <label class="remember">
+              <input type="checkbox" id="remember" checked /> Remember me
+            </label>
+            <a href="#" id="forgot-link">Forgot password?</a>
+          </div>
+
+          <p id="message" class="message" role="alert"></p>
+
+          <button type="submit" class="btn btn-solid btn-block" id="login-btn">
+            Sign In
+          </button>
+        </form>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <span>Bard's Canvas &amp; Murals</span>
+      <span>&copy; J. Andrew (Bard). Concrete to canvas.</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/admin-login.js"></script>
+  </body>
+</html>

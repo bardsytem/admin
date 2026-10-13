@@ -1,0 +1,262 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0b0b0a;
+  color: #f3efe8;
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- Top bar ---------- */
+.top-bar {
+  display: flex;
+  align-items: center;
+  padding: 20px 32px;
+  border-bottom: 1px solid #2c2a26;
+}
+
+.bards-logo {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.top-bar h1 {
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ---------- Centered area with orange glow ---------- */
+.login-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 90, 31, 0.15),
+    transparent 50%
+  );
+}
+
+/* ---------- Login card ---------- */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  background: #0e0e0d;
+  border: 1px solid #ff5a1f;
+  border-top: none;
+  border-bottom: none;
+  border-radius: 8px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.brand-box {
+  width: 40px;
+  height: 40px;
+  color: #0b0b0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.brand-name {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #ff5a1f;
+  font-family: "Space Mono", monospace;
+}
+
+.login-card h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.subtext {
+  margin: 0 0 20px;
+  font-size: 12px;
+  color: #c9a28f;
+}
+
+/* ---------- Form ---------- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+form label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #c9a28f;
+  margin-top: 10px;
+}
+
+.field {
+  width: 100%;
+  background: #1c1b18;
+  border: 1px solid #2c2a26;
+  border-radius: 3px;
+  color: #f3efe8;
+  padding: 12px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.field:focus {
+  outline: 2px solid #ff5a1f;
+  outline-offset: 1px;
+}
+
+/* Show / Hide button inside the password box */
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap .field {
+  padding-right: 60px;
+}
+
+#toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  color: #9c968c;
+  font-size: 11px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+#toggle-password:hover {
+  color: #f3efe8;
+}
+
+/* Remember me + Forgot password row */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.row label,
+.row a {
+  margin: 0;
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #9c968c;
+}
+
+.row a:hover {
+  color: #ff5a1f;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.remember input {
+  accent-color: #ff5a1f;
+}
+
+/* Error / success text (min-height stops the card from jumping) */
+.message {
+  min-height: 18px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #e53e3e;
+}
+
+/* ---------- Button ---------- */
+.btn {
+  padding: 12px;
+  border: 1px solid #ff5a1f;
+  border-radius: 3px;
+  background: #ff5a1f;
+  color: #0b0b0a;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #d6491a;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 20px 32px;
+  border-top: 1px solid #2c2a26;
+  font-size: 11px;
+  color: #9c968c;
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 480px) {
+  .top-bar,
+  .site-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .login-main {
+    padding: 16px;
+  }
+}

@@ -1,0 +1,140 @@
+/* Extra styles for admin-bookings.html (the rest comes from admin.css) */
+
+.two-panels {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* Dark calendar popup for the date inputs */
+input[type="date"] {
+  color-scheme: dark;
+}
+
+.muted-note {
+  font-size: 11px;
+  color: #9c968c;
+}
+
+/* ---------- Blocked windows list ---------- */
+.block-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.block-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #2c2a26;
+  border-radius: 3px;
+  background: #1c1b18;
+  padding: 12px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e53e3e;
+  flex-shrink: 0;
+}
+
+.block-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.block-text strong {
+  font-size: 13px;
+}
+
+.block-text span {
+  font-size: 11px;
+  color: #9c968c;
+  overflow-wrap: anywhere;
+}
+
+.btn-small {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 10px;
+  border: 1px solid #2c2a26;
+  border-radius: 3px;
+  background: transparent;
+  color: #f3efe8;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-small:hover {
+  border-color: #e53e3e;
+  color: #e53e3e;
+}
+
+/* ---------- Client bookings table ---------- */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid #2c2a26;
+  border-radius: 3px;
+  background: #151412;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9c968c;
+  padding: 12px;
+  border-bottom: 1px solid #2c2a26;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid #2c2a26;
+  vertical-align: top;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.table a {
+  color: #ff5a1f;
+}
+
+.table .details-cell {
+  max-width: 280px;
+  color: #9c968c;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 960px) {
+  .two-panels {
+    grid-template-columns: 1fr;
+  }
+}

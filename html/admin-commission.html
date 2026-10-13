@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bard's Canvas | Admin Pricing</title>
+    <link rel="stylesheet" href="../css/admin.css" />
+    <link rel="stylesheet" href="../css/admin-commission.css" />
+  </head>
+  <body class="is-checking">
+    <!-- ================= Header ================= -->
+    <header class="top-bar">
+      <div class="logo-container">
+        <img
+          src="../assets/bards-logo.png"
+          alt="Bard's Canvas Logo"
+          class="bards-logo"
+        />
+        <h1>Bard's Canvas</h1>
+      </div>
+
+      <nav class="nav-links">
+        <a href="admin.html" class="nav-link">Gallery</a>
+        <a href="admin-bookappointment.html" class="nav-link"
+          >Book Appointment</a
+        >
+        <a href="admin-commission.html" class="nav-link is-active"
+          >Price Quotation</a
+        >
+      </nav>
+
+      <div class="top-actions">
+        <button type="button" id="logout-btn" class="btn btn-outline">
+          Log out
+        </button>
+        <span class="avatar" title="J. Andrew">JA</span>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">
+            <h2>Commission Pricing</h2>
+            <p class="section-sub">
+              Directly adjust the base formula for client estimates.
+            </p>
+          </div>
+        </div>
+
+        <p class="state" id="pricing-state">Loading prices...</p>
+
+        <div class="pricing-panel" id="pricing-panel" hidden>
+          <!-- Left: pick what to edit -->
+          <div class="card">
+            <div class="form-row">
+              <span class="mini-label">1. Artwork Category</span>
+              <div class="option-row" id="category-options"></div>
+            </div>
+
+            <div class="form-row">
+              <span class="mini-label">2. Scope / Scale</span>
+              <div class="option-row" id="scale-options"></div>
+            </div>
+
+            <p class="hint" id="scale-hint"></p>
+          </div>
+
+          <!-- Middle: the three prices -->
+          <div class="card">
+            <div class="form-row">
+              <label for="price-base">Base Price</label>
+              <div class="money-wrap">
+                <input
+                  type="number"
+                  id="price-base"
+                  class="field"
+                  min="0"
+                  step="any"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="price-scale">Commission &amp; Expenses</label>
+              <div class="money-wrap">
+                <input
+                  type="number"
+                  id="price-scale"
+                  class="field"
+                  min="0"
+                  step="any"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="price-coat">Payable Baseline (Materials)</label>
+              <div class="money-wrap">
+                <input
+                  type="number"
+                  id="price-coat"
+                  class="field"
+                  min="0"
+                  step="any"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: total + save -->
+          <div class="card">
+            <span class="mini-label">Base Starting Estimate</span>
+            <div class="estimate-total" id="estimate-total">&#8369;0.00</div>
+            <p class="hint">
+              Sum of base, commission &amp; expenses, and materials.
+            </p>
+
+            <div class="unsaved" id="unsaved"></div>
+            <button
+              type="button"
+              id="save-rates"
+              class="btn btn-solid btn-block"
+            >
+              Update Rates
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <footer class="site-footer">
+      <span>Bard's Canvas &amp; Murals</span>
+      <span>&copy; J. Andrew (Bard). Concrete to canvas.</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/admin-guard.js"></script>
+    <script src="../js/admin-commission.js"></script>
+  </body>
+</html>

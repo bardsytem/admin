@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bard's Canvas | Admin Gallery</title>
+    <link rel="stylesheet" href="../css/admin.css" />
+  </head>
+  <body class="is-checking">
+    <!-- ================= Header ================= -->
+    <header class="top-bar">
+      <div class="logo-container">
+        <img
+          src="../assets/bards-logo.png"
+          alt="Bard's Canvas Logo"
+          class="bards-logo"
+        />
+        <h1>Bard's Canvas</h1>
+      </div>
+
+      <nav class="nav-links">
+        <a href="admin.html" class="nav-link is-active">Gallery</a>
+        <a href="admin-bookappointment.html" class="nav-link"
+          >Book Appointment</a
+        >
+        <a href="admin-commission.html" class="nav-link">Price Quotation</a>
+      </nav>
+
+      <div class="top-actions">
+        <button type="button" id="logout-btn" class="btn btn-outline">
+          Log out
+        </button>
+        <span class="avatar" title="J. Andrew">JA</span>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <!-- ================= Studio profile ================= -->
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>Studio Profile &amp; Bio</h2>
+            <p class="section-sub">
+              Update your story, studio signature photo, location tag, and
+              highlighted credentials shown on the public homepage.
+            </p>
+          </div>
+          <button type="button" id="save-profile" class="btn btn-solid">
+            Save Profile Section
+          </button>
+        </div>
+
+        <div class="profile-grid" id="profile-grid">
+          <!-- Left card -->
+          <div class="card">
+            <div class="card-title">Narrative &amp; Credentials</div>
+
+            <div class="two-col">
+              <div class="form-row">
+                <label for="p-headline">Section Headline</label>
+                <input type="text" id="p-headline" class="field" />
+              </div>
+              <div class="form-row">
+                <label for="p-tagline">Tagline / Pioneer Badge</label>
+                <input type="text" id="p-tagline" class="field" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="label-line">
+                <label for="p-story">Story Paragraph (About Text)</label>
+                <span class="count" id="story-count">0 characters</span>
+              </div>
+              <textarea id="p-story" class="field" rows="5"></textarea>
+            </div>
+
+            <div class="label-line">
+              <span class="mini-label">Highlighted Metrics (3 Badges)</span>
+            </div>
+            <div class="stats-edit">
+              <div class="stat-edit">
+                <span class="mini-label">Stat 01</span>
+                <input type="text" id="p-stat1-num" class="field" />
+                <input type="text" id="p-stat1-label" class="field" />
+              </div>
+              <div class="stat-edit">
+                <span class="mini-label">Stat 02</span>
+                <input type="text" id="p-stat2-num" class="field" />
+                <input type="text" id="p-stat2-label" class="field" />
+              </div>
+              <div class="stat-edit">
+                <span class="mini-label">Stat 03</span>
+                <input type="text" id="p-stat3-num" class="field" />
+                <input type="text" id="p-stat3-label" class="field" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Right card -->
+          <div class="card">
+            <div class="label-line">
+              <div class="card-title">Studio Identity &amp; Portrait</div>
+              <span class="sync-badge" id="sync-badge">Synced</span>
+            </div>
+
+            <button type="button" class="portrait-box" id="portrait-box">
+              <img id="portrait-img" alt="Studio portrait" hidden />
+              <span id="portrait-empty">Click to upload a portrait</span>
+            </button>
+            <input
+              type="file"
+              id="portrait-file"
+              accept="image/png,image/jpeg,image/webp"
+              hidden
+            />
+
+            <div class="form-row">
+              <label for="p-signature">Studio Signature Name</label>
+              <input type="text" id="p-signature" class="field" />
+            </div>
+            <div class="form-row">
+              <label for="p-location">Studio Location Tags</label>
+              <input type="text" id="p-location" class="field" />
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <strong>Homepage Commissions Badge</strong>
+                <span>Display "Open for Commissions" pill</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="p-commissions" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Gallery artworks ================= -->
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>Gallery Artworks</h2>
+            <p class="section-sub">
+              Manage public artworks displayed on your portfolio.
+            </p>
+          </div>
+          <button type="button" id="add-artwork" class="btn btn-solid">
+            + Add Artwork
+          </button>
+        </div>
+
+        <div class="toolbar">
+          <div class="tabs" role="tablist">
+            <button type="button" class="tab is-active" data-filter="all">
+              All (0)
+            </button>
+            <button type="button" class="tab" data-filter="mural">
+              Murals (0)
+            </button>
+            <button type="button" class="tab" data-filter="canvas">
+              Canvas (0)
+            </button>
+          </div>
+
+          <div class="toolbar-right">
+            <input
+              type="search"
+              id="search"
+              class="field"
+              placeholder="Filter artworks..."
+              aria-label="Filter artworks"
+            />
+            <select id="status-filter" class="field" aria-label="Status">
+              <option value="all">Status: All</option>
+              <option value="public">Status: Public</option>
+              <option value="hidden">Status: Hidden</option>
+            </select>
+
+            <!-- NEW -->
+            <select id="sort-order" class="field" aria-label="Sort">
+              <option value="newest">Sort: Newest upload</option>
+              <option value="oldest">Sort: Oldest upload</option>
+            </select>
+          </div>
+        </div>
+
+        <p id="gallery-state" class="state">Loading artworks...</p>
+        <div class="art-grid" id="art-grid"></div>
+      </section>
+    </main>
+
+    <!-- ================= Edit / Add modal ================= -->
+    <div class="modal" id="modal" hidden>
+      <div
+        class="modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <div class="modal-head">
+          <div>
+            <div class="modal-title-row">
+              <h3 id="modal-title">Edit Artwork</h3>
+              <span class="pill" id="modal-pill"></span>
+            </div>
+            <p class="section-sub" id="modal-sub">
+              Update metadata, visibility, image asset, and flags for this
+              public portfolio piece.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="icon-btn"
+            id="modal-close"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-image">
+            <div class="mini-label">Artwork Visual Asset</div>
+            <div class="preview-box" id="preview-box">
+              <img id="preview-img" alt="Artwork preview" hidden />
+            </div>
+            <div class="dropzone" id="dropzone" tabindex="0" role="button">
+              <strong>Drag new high-res image here</strong>
+              <span>PNG, JPG, WEBP up to 35MB</span>
+            </div>
+            <input
+              type="file"
+              id="a-file"
+              accept="image/png,image/jpeg,image/webp"
+              hidden
+            />
+          </div>
+
+          <div class="modal-fields">
+            <div class="two-col">
+              <div class="form-row">
+                <label for="a-title">Artwork Title</label>
+                <input type="text" id="a-title" class="field" />
+              </div>
+              <div class="form-row">
+                <label for="a-category">Category</label>
+                <select id="a-category" class="field">
+                  <option value="mural">Mural</option>
+                  <option value="canvas">Canvas</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="form-row">
+                <label for="a-year">Year</label>
+                <input type="text" id="a-year" class="field" />
+              </div>
+              <div class="form-row">
+                <label for="a-dimensions">Dimensions (W &times; H)</label>
+                <input type="text" id="a-dimensions" class="field" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="a-location">Location / Wall Site</label>
+              <input type="text" id="a-location" class="field" />
+            </div>
+
+            <div class="form-row">
+              <div class="label-line">
+                <label for="a-desc">Artwork Story &amp; Description</label>
+                <span class="count" id="a-count">0 characters</span>
+              </div>
+              <textarea id="a-desc" class="field" rows="4"></textarea>
+            </div>
+
+            <div class="checks">
+              <label><input type="checkbox" id="a-visible" /> Public</label>
+              <label><input type="checkbox" id="a-featured" /> Featured</label>
+              <label><input type="checkbox" id="a-sold" /> Sold</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" class="btn-link" id="modal-delete">
+            Delete Artwork
+          </button>
+          <div class="foot-actions">
+            <button type="button" class="btn-ghost" id="modal-cancel">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-solid" id="modal-save">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <footer class="site-footer">
+      <span>Bard's Canvas &amp; Murals</span>
+      <span>&copy; J. Andrew (Bard). Concrete to canvas.</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/admin-guard.js"></script>
+    <script src="../js/admin.js"></script>
+  </body>
+</html>
