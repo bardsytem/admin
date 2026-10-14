@@ -3,23 +3,22 @@ const BUCKET = "gallery"; // Supabase Storage bucket for photos
 const MAX_SIZE = 35 * 1024 * 1024; // 35MB
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-// Category value in the database -> name shown on the page
 const CATEGORY_NAMES = { mural: "Mural", canvas: "Canvas", others: "Others" };
 
 // ===================== Data kept while the page is open =====================
-let items = []; // all artworks from the database
+let items = [];
 let filterCategory = "all";
 let filterSearch = "";
 let filterStatus = "all";
-let sortOrder = "newest"; // "newest" or "oldest"
+let sortOrder = "newest";
 
-let editingId = null; // null means we are adding a new artwork
-let newImageFile = null; // photo picked in the popup (not uploaded yet)
-let newPortraitFile = null; // portrait picked (not uploaded yet)
-let portraitUrl = null; // saved portrait
+let editingId = null;
+let newImageFile = null;
+let newPortraitFile = null;
+let portraitUrl = null;
 
-let canvasPrices = {}; // price of each canvas artwork, keyed by artwork id
-let pricesLoaded = false; // true once the prices were read from the database
+let canvasPrices = {};
+let pricesLoaded = false;
 
 // Profile column name -> input id
 const PROFILE_FIELDS = {
@@ -34,6 +33,9 @@ const PROFILE_FIELDS = {
   stat3_label: "p-stat3-label",
   signature_name: "p-signature",
   location_tag: "p-location",
+  contact_name: "p-contact-name",
+  contact_phone: "p-contact-phone",
+  contact_facebook: "p-contact-fb",
 };
 
 // ===================== Small helpers =====================
@@ -48,7 +50,6 @@ function esc(text) {
   return div.innerHTML.replace(/"/g, "&quot;");
 }
 
-// Old images are saved like "assets/x.png". This page is inside /html, so add "../"
 function imgSrc(url) {
   if (!url) return "";
   return url.startsWith("http") ? url : "../" + url;
@@ -109,7 +110,7 @@ async function checkLogin() {
     window.location.href = "admin-login.html";
     return false;
   }
-  document.body.classList.remove("is-checking"); // show the page
+  document.body.classList.remove("is-checking");
   return true;
 }
 
@@ -177,6 +178,11 @@ async function saveProfile() {
       row[column] = $(PROFILE_FIELDS[column]).value.trim();
     }
 
+    // Add https:// if the Facebook link was typed without it
+    if (row.contact_facebook && !/^https?:\/\//i.test(row.contact_facebook)) {
+      row.contact_facebook = "https://" + row.contact_facebook;
+    }
+
     const { error } = await supabaseClient.from("site_profile").upsert(row);
     if (error) throw error;
 
@@ -222,7 +228,7 @@ async function loadGallery() {
   const { data, error } = await supabaseClient
     .from("gallery_items")
     .select("*")
-    .order("id", { ascending: false }); // newest upload first
+    .order("id", { ascending: false });
 
   if (error) {
     $("gallery-state").textContent =
@@ -390,7 +396,7 @@ function setupGallery() {
 }
 
 // ===================== Edit / Add popup =====================
-// Show the price box and "Not for sale" switch only for canvas artworks
+
 function updateSaleBlock() {
   const isCanvas = $("a-category").value === "canvas";
   $("sale-block").hidden = !isCanvas;
@@ -399,7 +405,7 @@ function updateSaleBlock() {
 
 // Save or remove the price of a canvas artwork
 async function savePrice(itemId, row) {
-  if (!pricesLoaded) return; // never change prices we could not read
+  if (!pricesLoaded) return;
 
   const price = $("a-price").value.trim();
   const hasPrice =
@@ -412,7 +418,6 @@ async function savePrice(itemId, row) {
       .from("canvas_prices")
       .upsert({ item_id: itemId, price: Number(price) });
   } else {
-    // Blank, not for sale, or not a canvas: no price of its own
     result = await supabaseClient
       .from("canvas_prices")
       .delete()
@@ -432,7 +437,7 @@ function openModal(id) {
   newImageFile = null;
   $("a-file").value = "";
 
-  const item = items.find((i) => i.id === id); // undefined when adding
+  const item = items.find((i) => i.id === id);
 
   $("modal-title").textContent = item ? "Edit Artwork" : "Add Artwork";
   $("modal-pill").textContent = item ? item.title : "";
@@ -455,7 +460,7 @@ function openModal(id) {
   showPreview(item ? imgSrc(item.image_url) : "");
 
   $("modal").hidden = false;
-  document.body.style.overflow = "hidden"; // stop the page behind from scrolling
+  document.body.style.overflow = "hidden";
   $("a-title").focus();
 }
 
@@ -474,7 +479,7 @@ function pickArtworkImage(file) {
 
 async function saveArtwork() {
   const title = $("a-title").value.trim();
-  const item = items.find((i) => i.id === editingId); // undefined when adding
+  const item = items.find((i) => i.id === editingId);
 
   if (!title) {
     toast("Please enter an artwork title.", true);

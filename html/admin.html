@@ -20,10 +20,8 @@
 
       <nav class="nav-links">
         <a href="admin.html" class="nav-link is-active">Gallery</a>
-        <a href="admin-bookappointment.html" class="nav-link"
-          >Book Appointment</a
-        >
-        <a href="admin-commission.html" class="nav-link">Price Quotation</a>
+        <a href="admin-bookappointment.html" class="nav-link">Appointment</a>
+        <a href="admin-commission.html" class="nav-link">Commission</a>
       </nav>
 
       <div class="top-actions">
@@ -92,6 +90,42 @@
                 <span class="mini-label">Stat 03</span>
                 <input type="text" id="p-stat3-num" class="field" />
                 <input type="text" id="p-stat3-label" class="field" />
+              </div>
+            </div>
+
+            <!-- Contact info shown on the public homepage -->
+            <div class="contact-edit">
+              <span class="mini-label">Homepage Contact Info</span>
+
+              <div class="two-col">
+                <div class="form-row">
+                  <label for="p-contact-name"
+                    >Name (next to the Facebook icon)</label
+                  >
+                  <input type="text" id="p-contact-name" class="field" />
+                </div>
+                <div class="form-row">
+                  <label for="p-contact-phone">Phone number</label>
+                  <input
+                    type="tel"
+                    id="p-contact-phone"
+                    class="field"
+                    inputmode="tel"
+                    placeholder="+0961-980-7017"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label for="p-contact-fb"
+                  >Facebook link (copied when clicked)</label
+                >
+                <input
+                  type="url"
+                  id="p-contact-fb"
+                  class="field"
+                  placeholder="https://www.facebook.com/your-page"
+                />
               </div>
             </div>
           </div>

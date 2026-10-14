@@ -228,3 +228,22 @@
   scrollbar-width: thin;
   scrollbar-color: #3a3833 #0b0b0a;
 }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+  .canvas-pick {
+    flex-wrap: wrap;
+  }
+
+  .canvas-pick .field {
+    flex: 1 1 calc(100% - 78px);
+  }
+
+  .canvas-pick .btn {
+    flex: 1 1 100%;
+  }
+
+  .estimate-total {
+    font-size: 28px;
+  }
+}

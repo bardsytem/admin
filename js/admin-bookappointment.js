@@ -1,5 +1,4 @@
 (function () {
-  // These labels should match the time slots on the public BookAppointment page
   const TIME_SLOTS = [
     "All Day",
     "10:00 - 11:00 AM",
@@ -8,13 +7,13 @@
     "05:00 - 06:00 PM",
   ];
 
-  const MAX_VISIBLE = 5; // show this many rows, then scroll
+  const MAX_VISIBLE = 5;
 
-  let bookings = []; // all bookings loaded from Supabase
-  let blocks = []; // all blocked windows loaded from Supabase
+  let bookings = [];
+  let blocks = [];
   let bookingsSort = "recent";
-  let bookingsFilter = "pending"; // "pending" | "confirmed" | "all"
-  let gmeetLink = ""; // the one Gmeet link sent to clients
+  let bookingsFilter = "pending";
+  let gmeetLink = "";
 
   const el = {
     bookingsSort: document.getElementById("bookings-sort"),
@@ -369,8 +368,6 @@
   }
 
   // ---------- Emails (EmailJS) ----------
-  // Virtual + link, or studio visit -> "accepted" message
-  // Onsite inspection, or virtual with NO link -> "acknowledged" notice
   function buildEmail(b) {
     const kind = meetingKind(b.meeting_type);
     const link = gmeetLink;
